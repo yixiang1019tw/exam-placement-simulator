@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>落點雷達｜會考志願模擬器</title>
+    <style>
+      :root {
+        --ink: #17202a;
+        --muted: #66717f;
+        --paper: #f7f4ed;
+        --card: #fffdf8;
+        --line: #e6e0d5;
+        --navy: #18324a;
+        --teal: #177e89;
+        --gold: #e6a93a;
+        --green: #28856b;
+        --red: #c65b5b;
+        --shadow: 0 16px 42px rgba(31, 45, 61, 0.08);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Noto Sans TC",
+          "PingFang TC",
+          Arial,
+          sans-serif;
+        line-height: 1.5;
+      }
+      button,
+      select,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .app {
+        max-width: 1440px;
+        margin: auto;
+        padding: 28px 34px 48px;
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: var(--navy);
+        color: #ffe1a3;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 22px;
+        box-shadow: 0 7px 0 #d2c7b5;
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: var(--teal);
+        font-weight: 800;
+      }
+      .brand h1 {
+        font-size: 20px;
+        margin: 0;
+        letter-spacing: 0.03em;
+      }
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .ghost,
+      .primary {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 10px 14px;
+        background: transparent;
+        color: var(--navy);
+        font-weight: 700;
+      }
+      .primary {
+        background: var(--navy);
+        color: white;
+        border-color: var(--navy);
+        box-shadow: 0 4px 0 #0d2030;
+      }
+      .primary:active,
+      .ghost:active {
+        transform: translateY(2px);
+        box-shadow: none;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+      .hero-copy {
+        background: var(--navy);
+        color: white;
+        border-radius: 24px;
+        padding: 34px 38px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      .hero-copy:after {
+        content: "";
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 225, 163, 0.3);
+        right: -70px;
+        top: -95px;
+      }
+      .hero h2 {
+        font-size: 38px;
+        line-height: 1.12;
+        margin: 7px 0 14px;
+        letter-spacing: -0.04em;
+      }
+      .hero p {
+        color: #d6e1e7;
+        max-width: 620px;
+        margin: 0;
+      }
+      .hero-note {
+        margin-top: 24px;
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        color: #ffe1a3;
+        font-size: 13px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .stat {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .stat .label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .stat strong {
+        font-size: 31px;
+        color: var(--navy);
+        letter-spacing: -0.04em;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 22px;
+        align-items: start;
+      }
+      .panel,
+      .result-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+      }
+      .panel {
+        padding: 22px;
+        position: sticky;
+        top: 18px;
+      }
+      .panel-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 18px;
+      }
+      .panel h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .section {
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        margin-top: 18px;
+      }
+      .section:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+      }
+      .section h4 {
+        font-size: 13px;
+        margin: 0 0 12px;
+        color: var(--navy);
+        letter-spacing: 0.04em;
+      }
+      .field-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .field label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 5px;
+      }
+      .field select,
+      .field input {
+        width: 100%;
+        border: 1px solid #d9d2c7;
+        background: #fffefb;
+        border-radius: 10px;
+        padding: 10px;
+        color: var(--ink);
+        outline: none;
+      }
+      .field select:focus,
+      .field input:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(23, 126, 137, 0.12);
+      }
+      .wide {
+        grid-column: 1/-1;
+      }
+      .toggle-list {
+        display: grid;
+        gap: 9px;
+      }
+      .toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fbfaf6;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 9px 11px;
+        font-size: 13px;
+      }
+      .toggle input {
+        accent-color: var(--teal);
+        width: 17px;
+        height: 17px;
+      }
+      .hint {
+        background: #eef7f5;
+        border-left: 3px solid var(--teal);
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: #315f64;
+        font-size: 12px;
+        margin-top: 14px;
+      }
+      .results-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        margin-bottom: 13px;
+      }
+      .results-head h3 {
+        margin: 0;
+        font-size: 22px;
+      }
+      .legend {
+        display: flex;
+        gap: 13px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 4px;
+      }
+      .green {
+        background: var(--green);
+      }
+      .gold {
+        background: var(--gold);
+      }
+      .red {
+        background: var(--red);
+      }
+      .result-card {
+        padding: 20px;
+        margin-bottom: 13px;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+      .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 19px 45px rgba(31, 45, 61, 0.12);
+      }
+      .result-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .school {
+        display: flex;
+        gap: 13px;
+      }
+      .school-no {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: #edf3f4;
+        color: var(--teal);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+      .school h4 {
+        font-size: 17px;
+        margin: 0 0 2px;
+      }
+      .school p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .badge {
+        font-size: 12px;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-weight: 800;
+        height: max-content;
+        white-space: nowrap;
+      }
+      .badge.safe {
+        background: #e5f3ec;
+        color: #197050;
+      }
+      .badge.maybe {
+        background: #fff3d7;
+        color: #916814;
+      }
+      .badge.challenge {
+        background: #f9e4e2;
+        color: #a34141;
+      }
+      .bar {
+        height: 8px;
+        background: #eee9df;
+        border-radius: 20px;
+        margin: 16px 0 10px;
+        overflow: hidden;
+      }
+      .bar span {
+        display: block;
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, var(--teal), #4fb5a1);
+      }
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .meta b {
+        color: var(--ink);
+      }
+      .insight {
+        margin-top: 14px;
+        padding: 11px 13px;
+        border-radius: 11px;
+        background: #faf8f1;
+        font-size: 12px;
+        color: #59636c;
+      }
+      .model {
+        margin-top: 22px;
+        background: #1e3b50;
+        color: #eaf3f4;
+        border-radius: 18px;
+        padding: 20px;
+      }
+      .model h3 {
+        margin: 0 0 10px;
+        font-size: 17px;
+        color: white;
+      }
+      .model p {
+        font-size: 12px;
+        line-height: 1.75;
+        color: #c9dde0;
+        margin: 7px 0;
+      }
+      .formula {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        color: #ffe0a0;
+        background: rgba(0, 0, 0, 0.18);
+        padding: 11px;
+        border-radius: 9px;
+        overflow: auto;
+        white-space: nowrap;
+      }
+      .strategy-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .strategy-item {
+        background: rgba(0, 0, 0, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .strategy-item h4 {
+        color: #fff;
+        margin: 0 0 6px;
+        font-size: 14px;
+      }
+      .strategy-item b {
+        color: #ffe0a0;
+      }
+      .disclaimer {
+        font-size: 11px;
+        color: #88929c;
+        margin-top: 16px;
+      }
+      .toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        background: var(--navy);
+        color: #fff;
+        padding: 12px 16px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: 0.2s;
+        pointer-events: none;
+        font-size: 13px;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          position: static;
+        }
+        .stats {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 650px) {
+        .app {
+          padding: 20px 14px 35px;
+        }
+        .topbar {
+          align-items: flex-start;
+        }
+        .top-actions .ghost {
+          display: none;
+        }
+        .hero-copy {
+          padding: 28px 24px;
+        }
+        .hero h2 {
+          font-size: 31px;
+        }
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stat {
+          padding: 15px;
+        }
+        .stat strong {
+          font-size: 25px;
+        }
+        .field-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .results-head {
+          display: block;
+        }
+        .legend {
+          margin-top: 9px;
+        }
+        .result-top {
+          align-items: start;
+        }
+        .meta {
+          flex-direction: column;
+          gap: 3px;
+        }
+      }
+      .subject-checks {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin: 14px 0;
+      }
+      .subject-check {
+        border: 1px solid #d8e0df;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fbfcfb;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .subject-check b {
+        font-size: 14px;
+      }
+      .subject-check small {
+        font-size: 11px;
+        color: #647276;
+        line-height: 1.4;
+      }
+      .subject-check.pass {
+        border-color: #8bc8a8;
+        background: #f2fbf5;
+      }
+      .subject-check.pass b {
+        color: #137a43;
+      }
+      .subject-check.fail {
+        border-color: #ed9c9c;
+        background: #fff6f6;
+      }
+      .subject-check.fail b {
+        color: #b42323;
+      }
+      .subject-check.unknown {
+        border-color: #d4c99a;
+        background: #fffdf2;
+      }
+      .subject-check.unknown b {
+        color: #8a6d1d;
+      }
+      @media (max-width: 760px) {
+        .subject-checks {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark">雷</div>
+          <div>
+            <div class="eyebrow">PLACEMENT RADAR</div>
+            <h1>落點雷達｜會考志願模擬器</h1>
+          </div>
+        </div>
+        <div class="top-actions"><button class="ghost" id="resetBtn">重設資料</button><button class="ghost" id="refreshBtn">↻ 更新官方資料</button><button class="primary" id="exportBtn">匯出摘要</button></div>
+      </header>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow" style="color: #9bd6d2">即時試算・可填一項就開始</div>
+          <h2>先知道方向，<br />再安排志願。</h2>
+          <p>不必一次填完。輸入單科、多科或完整資料，系統會立即用已知條件估算學校落點，並清楚標示資料完整度與不確定性。</p>
+          <div class="hero-note">↗ 目前為可追溯資料模型原型；正式版須依年度簡章與放榜資料校準</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="label">目前資料完整度</span><strong id="completeness">0%</strong><span class="small">依已填欄位計算</span></div>
+          <div class="stat"><span class="label">公立學校名錄</span><strong id="schoolCount">309</strong><span class="small">教育部114學年度</span></div>
+          <div class="stat"><span class="label">生肖粗略修正</span><strong id="populationFactor">0.0%</strong><span class="small" id="populationLabel">只調整達標後機率</span></div>
+          <div class="stat"><span class="label">預估可信度</span><strong id="confidence">低</strong><span class="small">補填資料可提高</span></div>
+        </div>
+      </section>
+      <main class="layout">
+        <aside class="panel">
+          <div class="panel-title">
+            <div>
+              <div class="eyebrow">01 / INPUT</div>
+              <h3>建立你的試算條件</h3>
+            </div>
+            <span class="small">即時更新</span>
+          </div>
+          <div class="section">
+            <h4>招生區與學年度</h4>
+            <div class="field-grid">
+              <div class="field wide">
+                <label>就學區／縣市</label
+                ><select id="region">
+                  <option value="全台灣">全台灣</option>
+                  <option>基北區</option>
+                  <option>宜蘭區</option>
+                  <option>桃連區</option>
+                  <option>竹苗區</option>
+                  <option>中投區</option>
+                  <option>彰化區</option>
+                  <option>雲林區</option>
+                  <option>嘉義區</option>
+                  <option>臺南區</option>
+                  <option>屏東區</option>
+                  <option>高雄區</option>
+                  <option>花蓮區</option>
+                  <option>臺東區</option>
+                  <option>澎湖區</option>
+                  <option>金門區</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>會考年度</label
+                ><select id="year">
+                  <option value="2026">2026 會考（115學年度）</option>
+                  <option value="2025">2025 會考（114學年度）</option>
+                  <option value="2024">2024 會考（113學年度）</option>
+                  <option value="2023">2023 會考（112學年度）</option>
+                  <option value="2022">2022 會考（111學年度）</option>
+                  <option value="2021">2021 會考（110學年度）</option>
+                  <option value="2020">2020 會考（109學年度）</option>
+                  <option value="2019">2019 會考（108學年度）</option>
+                  <option value="2018">2018 會考（107學年度）</option>
+                  <option value="2027">2027 會考・預測</option>
+                  <option value="2028">2028 會考・預測</option>
+                  <option value="2029">2029 會考・預測</option>
+                  <option value="2030">2030 會考・預測</option>
+                </select>
+              </div>
+              <div class="field"><label>出生年月日（國曆）</label><input id="birthDate" type="date" aria-label="出生年月日（國曆）" /></div>
+              <div class="field wide">
+                <label>自動判定生肖 <span class="small" id="zodiacHint">請先輸入出生日期</span></label>
+                <div id="zodiacResult" style="padding: 10px; border: 1px solid #d9d2c7; background: #f5faf8; border-radius: 10px; color: #177e89; font-weight: 800">尚未判定</div>
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <h4>會考與作文成績 <span class="small">可留白</span></h4>
+            <div class="field-grid" id="scores"></div>
+            <div class="hint">未填科目不會被當作 C；系統將以「資料不足」與區間方式呈現。</div>
+          </div>
+          <div class="section">
+            <h4>超額比序與加分資料</h4>
+            <div class="field-grid">
+              <div class="field"><label>志願序（第幾志願）</label><input id="choice" type="number" min="1" max="30" placeholder="可留白" /></div>
+              <div class="field">
+                <label>作文級分</label
+                ><select id="essay">
+                  <option value="">未填</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                </select>
+              </div>
+            </div>
+            <div class="toggle-list" style="margin-top: 11px">
+              <label class="toggle">均衡學習達標 <input id="balance" type="checkbox" /></label><label class="toggle">服務學習達標 <input id="service" type="checkbox" /></label><label class="toggle">獎懲無不利紀錄 <input id="discipline" type="checkbox" /></label>
+            </div>
+          </div>
+          <div class="section">
+            <h4>權威模式狀態</h4>
+            <div class="hint" style="margin-top: 0">目前已啟用「官方規則優先」：只有匯入當年度官方簡章明列的校級／科別條件時，才會檢查硬條件；沒有可追溯正式門檻的學校，不會以熱門度、人口係數或民間估算冒充錄取標準。</div>
+          </div>
+          <div class="section">
+            <h4>資料狀態</h4>
+            <div class="hint" style="margin-top: 0"><span id="dataStatus">目前使用內嵌資料；可按右上角更新</span><br /><a href="https://data.gov.tw/dataset/9617" target="_blank" rel="noopener" style="color: #177e89">教育部資料集 9617</a>・<a href="https://stats.moe.gov.tw/files/opendata/base2.json" target="_blank" rel="noopener" style="color: #177e89">官方 JSON</a></div>
+            <div class="hint" style="margin-top: 8px">學校名錄採教育部資料；歷年錄取門檻由各就學區比序與招生結果決定，官方通常不公布固定校級最低分。本工具會分開標示官方資料、公開參考值與模型估算。</div>
+          </div>
+          <div class="section">
+            <h4>學校搜尋</h4>
+            <div class="field"><label>名稱或縣市</label><input id="schoolSearch" type="search" placeholder="例如：臺中、工業、女中" /></div>
+            <div class="hint">名錄含教育部公立高級中等學校名錄；可依已驗證錄取門檻或該區志願序排列。未有可追溯門檻者不填猜測分數。</div>
+          </div>
+          <div class="section">
+            <h4>志願序策略模擬</h4>
+            <div class="field-grid">
+              <div class="field wide">
+                <label>排序方式</label
+                ><select id="sortMode">
+                  <option value="zone">依該區志願序（桃連：武陵→中壢→桃園等）</option>
+                  <option value="threshold">依已驗證錄取門檻高到低</option>
+                  <option value="name">依學校名稱</option>
+                </select>
+              </div>
+              <div class="field wide">
+                <label>第一志願</label
+                ><select id="choice1">
+                  <option value="">請先選學校</option>
+                </select>
+              </div>
+              <div class="field wide">
+                <label>第二志願</label
+                ><select id="choice2">
+                  <option value="">請先選學校</option>
+                </select>
+              </div>
+              <div class="field wide">
+                <label>第三志願</label
+                ><select id="choice3">
+                  <option value="">請先選學校</option>
+                </select>
+              </div>
+            </div>
+            <div class="hint">策略模擬會比較第一至第三志願的條件符合度、資料完整度與風險。實際分發仍以各就學區當年度簡章與超額比序為準。</div>
+          </div>
+          <div class="section">
+            <h4>分析偏好</h4>
+            <div class="field">
+              <label>預估風格</label
+              ><select id="mode">
+                <option value="balanced">平衡估算</option>
+                <option value="conservative">保守估算（門檻偏高）</option>
+                <option value="optimistic">樂觀估算（門檻偏低）</option>
+              </select>
+            </div>
+          </div>
+        </aside>
+        <section>
+          <div class="results-head">
+            <div>
+              <div class="eyebrow">02 / LIVE RESULT</div>
+              <h3>即時落點預判</h3>
+            </div>
+            <div class="legend">
+              <span><i class="dot green"></i>安全</span><span><i class="dot gold"></i>可能</span><span><i class="dot red"></i>挑戰</span>
+            </div>
+          </div>
+          <div id="results"></div>
+          <div class="model strategy-panel">
+            <h3>志願序策略比較</h3>
+            <div id="strategyResults" class="strategy-grid"><div class="small" style="color: #c9dde0">請在左側選擇第一至第三志願。</div></div>
+          </div>
+          <div class="model">
+            <h3>生肖 × 人口背景分析</h3>
+            <p id="modelText">預設先用人多、競爭偏強情境檢查；若未達最低線，再依序壓回平均及人少情境。只有達到可追溯最低門檻時，才顯示符合狀態與可能性百分比；生肖不會改變正式比序。</p>
+            <div class="formula">人多 ×1.10 → 平均 ×1.00 → 人少 ×0.90；未達最低線＝0%，資料整理後顯示可能性</div>
+            <div class="disclaimer">人口係數不得直接視為錄取分數；正式版應逐年引用教育部、內政部、各就學區簡章、招生名額與放榜結果，並保存來源網址、發布日期與版本。</div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+      const subjects = [
+        ["國文", "chinese"],
+        ["英文", "english"],
+        ["數學", "math"],
+        ["社會", "social"],
+        ["自然", "science"],
+      ];
+      const grades = ["", "A++", "A+", "A", "B++", "B+", "B", "C"];
+      const schools = [];
+      const zodiacFactor = { rat: 0.0, ox: -0.02, tiger: -0.05, rabbit: 0.02, dragon: 0.05, snake: 0.01, horse: 0.01, goat: -0.01, monkey: 0.02, rooster: 0.0, pig: -0.01, dog: 0.01 };
+      const zodiacName = { rat: "鼠年", ox: "牛年", tiger: "虎年", rabbit: "兔年", dragon: "龍年", snake: "蛇年", horse: "馬年", goat: "羊年", monkey: "猴年", rooster: "雞年", dog: "狗年", pig: "豬年" };
+      const zodiacOrder = ["monkey", "rooster", "dog", "pig", "rat", "ox", "tiger", "rabbit", "dragon", "snake", "horse", "goat"];
+      const lunarNewYearFallback = { 1990: "1990-01-27", 1991: "1991-02-15", 1992: "1992-02-04", 1993: "1993-01-23", 1994: "1994-02-10", 1995: "1995-01-31", 1996: "1996-02-19", 1997: "1997-02-07", 1998: "1998-01-28", 1999: "1999-02-16", 2000: "2000-02-05", 2001: "2001-01-24", 2002: "2002-02-12", 2003: "2003-02-01", 2004: "2004-01-22", 2005: "2005-02-09", 2006: "2006-01-29", 2007: "2007-02-18", 2008: "2008-02-07", 2009: "2009-01-26", 2010: "2010-02-14", 2011: "2011-02-03", 2012: "2012-01-23", 2013: "2013-02-10", 2014: "2014-01-31", 2015: "2015-02-19", 2016: "2016-02-08", 2017: "2017-01-28", 2018: "2018-02-16", 2019: "2019-02-05", 2020: "2020-01-25", 2021: "2021-02-12", 2022: "2022-02-01", 2023: "2023-01-22", 2024: "2024-02-10", 2025: "2025-01-29", 2026: "2026-02-17", 2027: "2027-02-06", 2028: "2028-01-26", 2029: "2029-02-13", 2030: "2030-02-03", 2031: "2031-01-23", 2032: "2032-02-11", 2033: "2033-01-31", 2034: "2034-02-19", 2035: "2035-02-08" };
+      function chineseLunarYear(raw) {
+        const date = new Date(`${raw}T12:00:00`);
+        if (Number.isNaN(date.getTime())) return null;
+        try {
+          const parts = new Intl.DateTimeFormat("zh-TW-u-ca-chinese", { year: "numeric", month: "numeric", day: "numeric" }).formatToParts(date);
+          const part = parts.find((p) => p.type === "relatedYear" || p.type === "year");
+          const lunarYear = part ? Number(part.value) : NaN;
+          if (Number.isInteger(lunarYear) && lunarYear >= 1900 && lunarYear <= 2100) return lunarYear;
+        } catch (error) {}
+        const year = Number(raw.slice(0, 4));
+        const boundary = lunarNewYearFallback[year];
+        if (boundary) return raw < boundary ? year - 1 : year;
+        return year;
+      }
+      function getZodiac() {
+        const raw = document.querySelector("#birthDate").value;
+        if (!raw) return { key: "rat", name: "未判定", gregorianYear: null, lunarYear: null };
+        const gregorianYear = Number(raw.slice(0, 4));
+        const lunarYear = chineseLunarYear(raw);
+        const key = zodiacOrder[lunarYear % 12];
+        return { key, name: zodiacName[key], gregorianYear, lunarYear };
+      }
+      function updateZodiac() {
+        const z = getZodiac();
+        const result = document.querySelector("#zodiacResult");
+        const hint = document.querySelector("#zodiacHint");
+        if (z.lunarYear) {
+          const boundaryNote = z.gregorianYear !== z.lunarYear ? `（農曆${z.lunarYear}年）` : "";
+          result.textContent = `${z.gregorianYear} 年出生・${z.name}${boundaryNote}`;
+          hint.textContent = z.gregorianYear !== z.lunarYear ? "出生日期在農曆新年前，採前一個生肖年" : "已依農曆新年套用人口係數";
+        } else {
+          result.textContent = "尚未判定";
+          hint.textContent = "請先輸入出生日期";
+        }
+      }
+      const gradeScore = { "A++": 7, "A+": 6, A: 5, "B++": 4, "B+": 3, B: 2, C: 0 };
+      const scoreBox = document.querySelector("#scores");
+      scoreBox.innerHTML = subjects.map(([label, key]) => `<div class="field"><label>${label}<span class="small">可留白</span></label><select data-subject="${key}">${grades.map((g) => `<option value="${g}">${g || "未填"}</option>`).join("")}</select></div>`).join("");
+      function values() {
+        const score = {};
+        document.querySelectorAll("[data-subject]").forEach((e) => (score[e.dataset.subject] = e.value));
+        return score;
+      }
+      function updateChoiceOptions(list) {
+        const ids = ["choice1", "choice2", "choice3"];
+        ids.forEach((id, idx) => {
+          const el = document.querySelector("#" + id);
+          if (!el) return;
+          const prev = el.value;
+          el.innerHTML =
+            '<option value="">請選擇</option>' +
+            list
+              .slice(0, 80)
+              .map((x, i) => `<option value="${x.code}">${i + 1}. ${x.name}（${x.city}）</option>`)
+              .join("");
+          if (list.some((x) => x.code === prev)) el.value = prev;
+        });
+        renderStrategy(list);
+      }
+      function renderStrategy(list) {
+        const ids = ["choice1", "choice2", "choice3"];
+        const chosen = ids.map((id) => {
+          const code = document.querySelector("#" + id)?.value;
+          return list.find((x) => x.code === code);
+        });
+        const score = values();
+        const filled = Object.values(score).filter(Boolean).length;
+        const essay = document.querySelector("#essay").value;
+        const cards = chosen
+          .map((school, i) => {
+            if (!school) return `<div class="strategy-item"><h4>第${i + 1}志願</h4><div class="small" style="color:#c9dde0">尚未選擇</div></div>`;
+            const known = school.need.filter((k) => score[k]).length;
+            const coverage = Math.round((known / school.need.length) * 100);
+            const aCount = Object.values(score).filter((v) => ["A++", "A+", "A"].includes(v)).length;
+            let risk = school.threshold && filled >= 5 ? (aCount >= school.threshold.minA ? "需再看積點／+號" : "未達5A硬條件") : coverage < 100 ? "資料不足" : "依模型估算";
+            return `<div class="strategy-item"><h4>第${i + 1}志願・${school.name}</h4><div>覆蓋率 <b>${coverage}%</b></div><div>風險：<b>${risk}</b></div><div class="small" style="color:#c9dde0;margin-top:6px">${school.threshold?.label || "無已驗證校級硬門檻"}</div></div>`;
+          })
+          .join("");
+        document.querySelector("#strategyResults").innerHTML = cards;
+      }
+      const DATA_FILE_PREFIX = "./schools_";
+      const DATA_FILE_SUFFIX = ".json";
+      function normalizeOfficialRows(payload) {
+        const rows = Array.isArray(payload) ? payload : payload.data || payload.records || [];
+        const map = new Map();
+        rows.forEach((r) => {
+          const name = r["學校名稱"] || r.school_name || r.name;
+          const city = r["縣市名稱"] || r.city;
+          const type = r["設立別"] || r["公私立"] || r.type;
+          if (!name || !city || (type && String(type).includes("私"))) return;
+          const code = String(r["學校代碼"] || r.code || name);
+          if (!map.has(code))
+            map.set(code, {
+              code,
+              name,
+              city: String(city)
+                .replace(/^\[?\d+\]?/, "")
+                .trim(),
+              type: "公立高級中等學校",
+              base: 70,
+              hot: 4,
+              need: [],
+              officialSubjects: null,
+              reference: null,
+              thresholdSource: "官方學校名錄不等於正式錄取標準；尚未匯入就學區簡章",
+            });
+        });
+        return Array.from(map.values());
+      }
+      function preserveSchoolMetadata(fresh) {
+        const old = new Map(schools.map((x) => [x.code || x.name, x]));
+        return fresh.map((x) => {
+          const prior = old.get(x.code || x.name);
+          return prior ? { ...x, reference: prior.reference, thresholdSource: prior.thresholdSource, threshold: prior.threshold, base: prior.base, hot: prior.hot, need: prior.need, region: prior.region, admission_year: prior.admission_year, track: prior.track, officialSubjects: prior.officialSubjects, officialRuleStatus: prior.officialRuleStatus, officialRuleSource: prior.officialRuleSource, officialRuleNotes: prior.officialRuleNotes, schoolCondition: prior.schoolCondition, quota: prior.quota, quotaSource: prior.quotaSource } : x;
+        });
+      }
+      function currentDataFile() {
+        const year = document.querySelector("#year").value || "2026";
+        return `${DATA_FILE_PREFIX}${year}${DATA_FILE_SUFFIX}`;
+      }
+      async function loadYearData() {
+        const status = document.querySelector("#dataStatus");
+        const fileName = currentDataFile();
+        status.textContent = "正在整理本年度學校資料…";
+        try {
+          const res = await fetch(fileName, { cache: "no-store" });
+          if (!res.ok) throw new Error("data unavailable");
+          const payload = await res.json();
+          const rows = Array.isArray(payload) ? payload : payload.schools || [];
+          if (rows.length < 1) throw new Error("empty data");
+          schools.splice(0, schools.length, ...rows);
+          status.textContent = `已載入 ${document.querySelector("#year").selectedOptions[0].textContent} 資料（${rows.length} 所）`;
+          calc();
+        } catch (e) {
+          schools.splice(0, schools.length);
+          status.textContent = "本年度資料整理中，請先選擇已有資料的年度";
+          calc();
+        }
+      }
+      const zonePreference = {
+        桃連區: ["市立武陵高中", "國立中央大學附屬中壢高中", "市立桃園高中", "市立內壢高中", "市立南崁高中", "市立陽明高中", "市立平鎮高中", "市立永豐高中", "市立大園國際高中", "市立觀音高中", "國立北科大附屬桃園農工"],
+        基北區: ["建國中學", "北一女中", "師大附中", "成功高中", "中山女高", "松山高中", "大同高中", "中崙高中", "景美女中", "麗山高中", "板橋高中", "海山高中"],
+        竹苗區: ["國立新竹高中", "國立新竹女中", "國立竹北高中", "國立竹東高中", "國立建功高中", "國立六家高中"],
+        中投區: ["國立臺中第一高級中等學校", "國立臺中女中", "國立臺中二中", "國立文華高中", "國立興大附中", "市立惠文高中"],
+        臺南區: ["國立臺南第一高級中學", "國立臺南女中", "國立臺南二中", "國立家齊高中", "國立臺南高工"],
+        高雄區: ["國立高雄師大附中", "國立高雄高中", "國立高雄女中", "市立高雄中學", "市立中山高中", "市立新莊高中"],
+      };
+      function zoneRank(s, region) {
+        const list = zonePreference[region] || [];
+        const exact = list.findIndex((x) => s.name.includes(x) || x.includes(s.name));
+        return exact < 0 ? 999 - exact : s.name.includes("武陵") && region === "桃連區" ? 0 : exact;
+      }
+      function subjectStatus(s, key, score) {
+        const label = (subjects.find((x) => x[1] === key) || ["", key])[0];
+        const actual = score[key] || "";
+        const required = (s.threshold && s.threshold.subject && s.threshold.subject[key]) || "";
+        if (!actual) return { label, actual: "未填", required: required || "無校級硬門檻", state: required ? "資料不足" : "採計／資料不足", cls: "unknown" };
+        if (!required) return { label, actual, required: "無校級硬門檻", state: "採計；無校級硬門檻", cls: "unknown" };
+        const pass = gradeScore[actual] >= gradeScore[required];
+        return { label, actual, required, state: pass ? "達標" : "未達標", cls: pass ? "pass" : "fail" };
+      }
+      function scenarioResult(s, score) {
+        const points = Object.values(score)
+          .filter(Boolean)
+          .map((v) => gradeScore[v]);
+        if (!points.length) return { state: "資料不足", prob: null, label: "尚未填寫成績" };
+        if (typeof s.reference !== "number") return { state: "待核對", prob: null, label: "尚無可追溯歷年門檻" };
+        const complete = Object.values(score).filter(Boolean).length >= 3;
+        if (!complete) return { state: "資料不足", prob: null, label: "至少需填三科後才估算" };
+        const current = points.reduce((a, b) => a + b, 0) / (Object.values(score).filter(Boolean).length / 5);
+        const crowded = s.reference * 1.1,
+          average = s.reference,
+          low = s.reference * 0.9;
+        let state, prob, label;
+        if (current >= crowded) {
+          state = "符合";
+          prob = Math.min(92, Math.round(62 + (current - crowded) * 6));
+          label = "人多情境仍達最低線";
+        } else if (current >= average) {
+          state = "符合最低";
+          prob = Math.min(55, Math.max(25, Math.round(25 + (current - average) * 8)));
+          label = "壓回平均競爭後達最低線";
+        } else if (current >= low) {
+          state = "符合最低（人少）";
+          prob = Math.min(24, Math.max(8, Math.round(8 + (current - low) * 8)));
+          label = "僅在人少情境達最低線";
+        } else {
+          state = "未達最低・沒有機會";
+          prob = 0;
+          label = "即使壓回人少情境仍未達最低線";
+        }
+        if (prob > 0) {
+          const person = getZodiac();
+          const adjustment = person.lunarYear ? zodiacFactor[person.key] || 0 : 0;
+          prob = Math.max(1, Math.min(92, Math.round(prob * (1 + adjustment))));
+          label += person.lunarYear ? "；生肖僅作非直接微調" : "；未填生肖，未作微調";
+        }
+        return { state, prob, label };
+      }
+      function renderSchoolCard(s, i, score) {
+        const keys = Array.isArray(s.officialSubjects) ? s.officialSubjects : [];
+        const statuses = keys.map((k) => subjectStatus(s, k, score));
+        const hasAllRules = statuses.length > 0 && statuses.every((x) => x.required !== "未提供校級要求");
+        const strictOverall = statuses.length === 0 ? "資料整理中" : statuses.some((x) => x.state === "未達標") ? "未達最低" : hasAllRules && statuses.every((x) => x.state === "達標") ? "已符合" : "請補填資料";
+        const scenario = scenarioResult(s, score);
+        const overall = scenario.prob === 0 ? "未達最低・沒有機會" : scenario.prob === null ? strictOverall : scenario.state;
+        const overallCls = overall.includes("符合") || overall === "整體達標" ? "pass" : overall.includes("沒有機會") || overall === "未達標" ? "fail" : "unknown";
+        const known = statuses.filter((x) => x.actual !== "未填").length;
+        const coverage = statuses.length ? Math.round((known / statuses.length) * 100) : 0;
+        const details = statuses.length ? statuses.map((x) => '<div class="subject-check ' + x.cls + '"><span>' + x.label + "</span><b>" + x.state + "</b><small>你的成績：" + x.actual + " ・ 要求：" + x.required + "</small></div>").join("") : '<div class="subject-check unknown" style="grid-column:1/-1"><span>正式採計科目</span><b>資料整理中</b><small>請先選擇就學區，系統會顯示目前已整理的採計科目。</small></div>';
+        const ruleSource = s.officialRuleSource || s.thresholdSource || "資料整理中";
+        const probability = scenario.prob === null ? "待補資料" : scenario.prob + "%";
+        const scoreText = scenario.prob === 0 ? "未達最低標準，機率固定為0%" : scenario.prob === null ? (strictOverall === "已符合" ? "已依目前可核對要求完成檢查" : s.officialSubjects ? "已整理就學區正式採計科目；請補填成績查看結果" : "資料正在整理中") : scenario.label;
+        return '<article class="result-card"><div class="result-top"><div class="school"><div class="school-no">' + String(i + 1).padStart(2, "0") + "</div><div><h4>" + s.name + "</h4><p>" + s.city + "・" + s.type + '・預設先用人多情境檢查</p></div></div><span class="badge ' + overallCls + '">' + overall + '</span></div><div class="subject-checks">' + details + '</div><div class="meta"><span>科目資料覆蓋 <b>' + coverage + "%</b></span><span>可能性 <b>" + probability + '</b></span></div><div class="insight">' + scoreText + "。規則來源：" + ruleSource + "。" + (s.reference ? " 歷年門檻參考值：" + s.reference + "；此百分比是情境估算，不是官方錄取率。" : " 資料整理後會顯示可能性。") + "</div></article>";
+      }
+      function calc() {
+        const score = values(),
+          person = getZodiac(),
+          zodiac = person.key,
+          factor = person.lunarYear ? zodiacFactor[zodiac] : 0,
+          mode = document.querySelector("#mode").value;
+        const region = document.querySelector("#region").value,
+          search = (document.querySelector("#schoolSearch").value || "").trim();
+        const regionMap = { 基北區: ["臺北市", "新北市", "基隆市"], 宜蘭區: ["宜蘭縣"], 桃連區: ["桃園市"], 竹苗區: ["新竹市", "新竹縣", "苗栗縣"], 中投區: ["臺中市", "南投縣"], 彰化區: ["彰化縣"], 雲林區: ["雲林縣"], 嘉義區: ["嘉義市", "嘉義縣"], 臺南區: ["臺南市"], 屏東區: ["屏東縣"], 高雄區: ["高雄市"], 花蓮區: ["花蓮縣"], 臺東區: ["臺東縣"], 澎湖區: ["澎湖縣"], 金門區: ["金門縣"] };
+        const visible = schools.filter((s) => (region === "全台灣" || (regionMap[region] || []).includes(s.city)) && (!search || (s.name + s.city).includes(search)));
+        document.querySelector("#schoolCount").textContent = visible.length;
+
+        updateZodiac();
+        const filled = Object.values(score).filter(Boolean).length + (person.lunarYear ? 1 : 0) + (document.querySelector("#essay").value ? 1 : 0) + ["balance", "service", "discipline"].filter((id) => document.querySelector("#" + id).checked).length + (document.querySelector("#choice").value ? 1 : 0);
+        const completeness = Math.round((filled / 11) * 100);
+        document.querySelector("#completeness").textContent = completeness + "%";
+        document.querySelector("#populationFactor").textContent = person.lunarYear ? (factor >= 0 ? "+" : "") + (factor * 100).toFixed(1) + "%" : "未填";
+        document.querySelector("#populationLabel").textContent = "只調整達標後機率";
+        const confidence = completeness >= 80 ? "高" : completeness >= 45 ? "中" : "低";
+        document.querySelector("#confidence").textContent = confidence;
+        let total = 0,
+          count = 0;
+        Object.values(score).forEach((v) => {
+          if (v) {
+            total += gradeScore[v];
+            count++;
+          }
+        });
+        const avg = count ? total / count : 0;
+        const essay = document.querySelector("#essay").value;
+        if (essay) total += Number(essay) * 0.22;
+        const modeAdj = mode === "conservative" ? 2 : mode === "optimistic" ? -2 : 0;
+        document.querySelector("#modelText").textContent = `${person.lunarYear ? person.gregorianYear + "年出生・" + person.name + (person.gregorianYear !== person.lunarYear ? "（農曆" + person.lunarYear + "年）" : "") : "尚未輸入出生年月日"}；生肖不會改變正式比序、學校排序或最低標準，只在達標後對可能性做非直接微調。人口數只有在取得官方屆別考生人數、招生名額與分布資料後才可校正；目前填寫 ${count}/5 科，${essay ? "作文已納入" : "作文未納入"}。`;
+        const sortedVisible = [...visible].sort((a, b) => {
+          const modeSort = document.querySelector("#sortMode").value;
+          const zoneA = zoneRank(a, region),
+            zoneB = zoneRank(b, region);
+          return modeSort === "name" ? a.name.localeCompare(b.name, "zh-Hant") : modeSort === "threshold" ? (b.reference ?? -1) - (a.reference ?? -1) || zoneA - zoneB || b.hot - a.hot : zoneA - zoneB || b.hot - a.hot || a.name.localeCompare(b.name, "zh-Hant");
+        });
+        updateChoiceOptions(sortedVisible);
+        document.querySelector("#results").innerHTML = sortedVisible.map((s, i) => renderSchoolCard(s, i, score)).join("");
+      }
+      function toast(msg) {
+        const t = document.querySelector("#toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1800);
+      }
+      document.querySelectorAll("select,input").forEach((e) => e.addEventListener("input", calc));
+      document.querySelector("#birthDate").addEventListener("change", calc);
+      document.querySelectorAll("#sortMode,#choice1,#choice2,#choice3").forEach((e) =>
+        e.addEventListener("input", () => {
+          calc();
+        }),
+      );
+      document.querySelector("#refreshBtn").addEventListener("click", loadYearData);
+      document.querySelector("#year").addEventListener("change", loadYearData);
+      loadYearData();
+      document.querySelector("#resetBtn").onclick = () => {
+        document.querySelectorAll("select").forEach((e) => (e.selectedIndex = 0));
+        document.querySelectorAll("input[type=number],input[type=date]").forEach((e) => (e.value = ""));
+        document.querySelectorAll("input[type=checkbox]").forEach((e) => (e.checked = false));
+        calc();
+        toast("已重設所有試算條件");
+      };
+      document.querySelector("#exportBtn").onclick = () => {
+        const person = getZodiac();
+        const text = `落點雷達試算摘要\n招生區：${document.querySelector("#region").value}\n會考年度：${document.querySelector("#year").value}\n出生日期：${document.querySelector("#birthDate").value || "未填"}\n生肖：${person.lunarYear ? person.name : "未判定"}\n資料完整度：${document.querySelector("#completeness").textContent}\n生肖／人口提示：${document.querySelector("#populationFactor").textContent}（只作達標後非直接微調，不影響正式判定）\n\n本摘要為離線模型試算，不代表正式錄取結果。`;
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "落點雷達試算摘要.txt";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast("摘要已下載");
+      };
+      calc();
+    </script>
+  </body>
+</html>
